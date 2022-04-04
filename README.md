@@ -1,3 +1,5 @@
+This is the updated version from issue #2.
+
 ---
 page_type: sample
 languages:
