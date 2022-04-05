@@ -71,7 +71,7 @@ Pusher: @${{ github.actor }}"
 
   deploy-poi-api:
     needs: tests
-    if: github.ref == 'ref/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     runs-on: ubuntu-latest
 
