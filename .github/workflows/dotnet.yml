@@ -51,3 +51,21 @@ jobs:
         -d '{"title": "${{ github.workflow }} has failed: ${{ github.run_id }}",
         "body": "Failure in run: _${{ github.run_id }}_."
         }'
+
+    - name: Comment PR
+      uses: allthatjazzleo/actions-pull-request-add-comment@master
+      if: github.event_name == 'pull_request' && failure()
+      with:
+        message: "### Unit Test `failure`
+<details>
+<summary>Workflow details</summary>
+
+Workflow name: `${{ github.workflow }}`
+Action: `${{ github.event_name }}`
+Job: `${{ github.job }}`
+PR: #${{ github.event.number }}
+</details>
+
+Test details: [Run #${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+Pusher: @${{ github.actor }}"
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
