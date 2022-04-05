@@ -1,7 +1,7 @@
-/apis/poi/ @sommerdazuehlke
-/apis/trips/ @leovonwyss
-/apis/user-java/ @querciak
-/apis/userprofile/ @keth-dev
+/apis/poi/ @sommerdazuehlke @keth-dev @leovonwyss @querciak
+/apis/trips/ @sommerdazuehlke @keth-dev @leovonwyss @querciak
+/apis/user-java/ @sommerdazuehlke @keth-dev @leovonwyss @querciak
+/apis/userprofile/ @sommerdazuehlke @keth-dev @leovonwyss @querciak
 
-/iac/bicep/ @sommerdazuehlke
-/iac/terraform/ @leovonwyss
+/iac/bicep/ @sommerdazuehlke @keth-dev @leovonwyss @querciak
+/iac/terraform/ @sommerdazuehlke @keth-dev @leovonwyss @querciak
