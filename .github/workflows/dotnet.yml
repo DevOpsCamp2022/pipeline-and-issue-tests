@@ -1,4 +1,4 @@
-name: APIS/POI unit tests workflow
+name: 'dotnet-poi-test'
 
 on:
   push:
