@@ -14,7 +14,7 @@ env:
   tf_actions_working_dir: iac/terraform
 
 jobs:
-  terraform:
+  tests:
     name: 'Terraform'
     runs-on: ubuntu-latest
     environment: production

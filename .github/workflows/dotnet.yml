@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  dotnet-poi-test:
+  tests:
     name: 'apis/poi/ tests'
     runs-on: ubuntu-latest
     
