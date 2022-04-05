@@ -1,4 +1,4 @@
-name: 'dotnet-poi-test'
+name: 'apis/poi/ tests'
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
     - 'apis/poi/**'
 
 jobs:
-  build:
+  dotnet-poi-test:
 
     runs-on: ubuntu-latest
     
