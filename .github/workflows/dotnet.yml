@@ -68,3 +68,37 @@ PR: #${{ github.event.number }}
 Test details: [Run #${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
 Pusher: @${{ github.actor }}"
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy-poi-api:
+    needs: tests
+    if: github.ref == 'ref/heads/main' && github.event_name == 'push'
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: 'apis/poi/web'
+
+    steps:
+    - uses: actions/checkout@v3
+
+    # Azure Login
+    - name: Azure Login
+      run: |
+        az login --service-principal --username "${{ secrets.ARM_CLIENT_ID }}" --password "${{ secrets.ARM_CLIENT_SECRET }}" --tenant "${{ secrets.ARM_TENANT_ID }}" 
+        az account set --subscription "${{ secrets.ARM_SUBSCRIPTION_ID }}"
+    
+    - name: Set build version
+      id: build-version
+      run: echo "::set-output name=tag::$(date +%s)"
+
+    # Build and push image to acr
+    - name: Build and push the docker image
+      run: az acr build --image devopsoh/api-poi:${{ steps.build-version.outputs.tag }} --registry ${{secrets.CONTAINER_LOGIN_SERVER}} --build-arg build_versions=${{ steps.build-version.outputs.tag }} --file Dockerfile .
+
+    - name: Deploy to Staging
+      uses: Azure/webapps-deploy@v2
+      with:
+        app-name: devopsoh81421poi
+        slot-name: staging # optional, default is production
+        images: ${{secrets.CONTAINER_LOGIN_SERVER}}/devopsoh/api-poi:${{ steps.build-version.outputs.tag }}
