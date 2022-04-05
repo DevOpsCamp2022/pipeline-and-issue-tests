@@ -1,3 +1,5 @@
+Let's build and push a new container... after merge to main.
+
 # POI Service
 
 This should trigger a build
