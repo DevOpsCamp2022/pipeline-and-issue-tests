@@ -1,0 +1,16 @@
+name: Dummy Status Creator
+
+on:
+  pull_request:
+    paths-ignore:
+    - 'apis/poi/**'
+    - 'iac/terraform/**'
+    
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run a one-line script
+        run: echo 'No tests required'
+ 
