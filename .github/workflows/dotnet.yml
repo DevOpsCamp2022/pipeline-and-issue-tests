@@ -141,7 +141,7 @@ jobs:
     - name: Output container version
       run: curl ${{ env.staging-url }}/api/version/poi
         
-swap-poi-api:
+  swap-poi-api:
     needs: deploy-poi-api
 
     steps:
