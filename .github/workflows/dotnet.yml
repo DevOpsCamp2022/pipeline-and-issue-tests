@@ -1,4 +1,4 @@
-name: 'apis/poi/ tests'
+name: 'POI API CI/CD Pipeline: build/test/deploy'
 
 on:
   push:
@@ -9,6 +9,10 @@ on:
     paths:
     - 'apis/poi/**'
   workflow_dispatch:
+    inputs:
+      force-deployment:
+        type: boolean
+        description: Force the deployment step
 
 jobs:
   tests:
@@ -71,7 +75,7 @@ Pusher: @${{ github.actor }}"
 
   deploy-poi-api:
     needs: tests
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: (github.ref == 'refs/heads/main') && (github.event_name == 'push' || github.event.inputs.force-deployment == 'true')
 
     runs-on: ubuntu-latest
 
