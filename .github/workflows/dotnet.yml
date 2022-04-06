@@ -94,7 +94,7 @@ Pusher: @${{ github.actor }}"
 
     # Build and push image to acr
     - name: Build and push the docker image
-      run: az acr build --image devopsoh/api-poi:${{ steps.build-version.outputs.tag }} --registry ${{secrets.CONTAINER_LOGIN_SERVER}} --build-arg build_versions=${{ steps.build-version.outputs.tag }} --file Dockerfile .
+      run: az acr build --image devopsoh/api-poi:${{ steps.build-version.outputs.tag }} --registry ${{secrets.CONTAINER_LOGIN_SERVER}} --build-arg build_version=${{ steps.build-version.outputs.tag }} --file Dockerfile .
 
     - name: Deploy to Staging
       uses: Azure/webapps-deploy@v2
