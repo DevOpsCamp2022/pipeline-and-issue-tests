@@ -13,6 +13,10 @@ on:
       force-deployment:
         type: boolean
         description: Force the deployment step
+ 
+env:
+  prod-url: 'https://devopsoh81421poi.azurewebsites.net'
+  staging-url: 'https://devopsoh81421poi-staging.azurewebsites.net'
 
 jobs:
   tests:
@@ -78,14 +82,13 @@ jobs:
     if: (github.ref == 'refs/heads/main') && (github.event_name == 'push' || github.event.inputs.force-deployment == 'true')
 
     runs-on: ubuntu-latest
-    
-    env:
-      prod-url: 'https://devopsoh81421poi.azurewebsites.net'
-      staging-url: 'https://devopsoh81421poi-staging.azurewebsites.net'
 
     defaults:
       run:
         working-directory: 'apis/poi/web'
+
+    outputs:
+      tag: ${{ steps.build-version.outputs.tag }}
 
     steps:
     - uses: actions/checkout@v3
@@ -138,3 +141,26 @@ jobs:
     - name: Output container version
       run: curl ${{ env.staging-url }}/api/version/poi
         
+swap-poi-api:
+    needs: deploy-poi-api
+
+    steps:
+
+    # Azure Login
+    - name: Azure Login
+      run: |
+        az login --service-principal --username "${{ secrets.ARM_CLIENT_ID }}" --password "${{ secrets.ARM_CLIENT_SECRET }}" --tenant "${{ secrets.ARM_TENANT_ID }}" 
+        az account set --subscription "${{ secrets.ARM_SUBSCRIPTION_ID }}"
+    
+    - name: Azure Swap
+      run: az webapp deployment slot swap --name devopsoh81421poi --slot staging
+
+    - name: Wait for the new version
+      shell: pwsh
+      run: |
+          $retries = 99;
+          while (($retries -gt 0) -and ((Invoke-WebRequest "${{ env.prod-url }}/api/version/poi").Content -ne "${{ needs.deploy-poi-api.outputs.tag }}")) {
+              $retries = $retries-1;
+              Write-Host "Not yet on the expected version... $retries retries left..."
+              Start-Sleep 5
+          }
