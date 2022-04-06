@@ -111,8 +111,15 @@ jobs:
         slot-name: staging # optional, default is production
         images: ${{secrets.CONTAINER_LOGIN_SERVER}}/devopsoh/api-poi:${{ steps.build-version.outputs.tag }}
     
-    - name: Sleep
-      run: sleep 30
+    - name: Wait for the new version
+      shell: pwsh
+      run: |
+          $retries = 99;
+          while (($retries -gt 0) -and ((Invoke-WebRequest "${{ env.staging-url }}/api/version/poi").Content -ne "${{ steps.build-version.outputs.tag }}")) {
+              $retries = $retries-1;
+              Write-Host "Not yet on the expected version... $retries retries left..."
+              Start-Sleep 5
+          }
     
     - name: Check the deployed service URL for STAGING
       uses: jtalk/url-health-check-action@v2
