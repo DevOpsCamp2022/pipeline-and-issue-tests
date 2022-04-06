@@ -143,10 +143,10 @@ jobs:
         
   swap-poi-api:
     needs: deploy-poi-api
+    
+    runs-on: ubuntu-latest
 
     steps:
-
-    # Azure Login
     - name: Azure Login
       run: |
         az login --service-principal --username "${{ secrets.ARM_CLIENT_ID }}" --password "${{ secrets.ARM_CLIENT_SECRET }}" --tenant "${{ secrets.ARM_TENANT_ID }}" 
