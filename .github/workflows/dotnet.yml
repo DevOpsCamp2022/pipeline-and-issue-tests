@@ -94,7 +94,7 @@ Pusher: @${{ github.actor }}"
     
     - name: Set build version
       id: build-version
-      run: echo "::set-output name=tag::$(date +%s)"
+      run: echo "::set-output name=tag::$(date +%s)+${{ github.sha }}"
 
     # Build and push image to acr
     - name: Build and push the docker image
