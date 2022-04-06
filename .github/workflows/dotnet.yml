@@ -60,17 +60,17 @@ jobs:
       if: github.event_name == 'pull_request' && failure()
       with:
         message: "### Unit Test `failure`
-<details>
-<summary>Workflow details</summary>
+          <details>
+          <summary>Workflow details</summary>
 
-Workflow name: `${{ github.workflow }}`
-Action: `${{ github.event_name }}`
-Job: `${{ github.job }}`
-PR: #${{ github.event.number }}
-</details>
+          Workflow name: `${{ github.workflow }}`
+          Action: `${{ github.event_name }}`
+          Job: `${{ github.job }}`
+          PR: #${{ github.event.number }}
+          </details>
 
-Test details: [Run #${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
-Pusher: @${{ github.actor }}"
+          Test details: [Run #${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          Pusher: @${{ github.actor }}"
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   deploy-poi-api:
@@ -78,6 +78,10 @@ Pusher: @${{ github.actor }}"
     if: (github.ref == 'refs/heads/main') && (github.event_name == 'push' || github.event.inputs.force-deployment == 'true')
 
     runs-on: ubuntu-latest
+    
+    env:
+      prod-url: 'https://devopsoh81421poi.azurewebsites.net'
+      staging-url: 'https://devopsoh81421poi-staging.azurewebsites.net'
 
     defaults:
       run:
@@ -106,3 +110,24 @@ Pusher: @${{ github.actor }}"
         app-name: devopsoh81421poi
         slot-name: staging # optional, default is production
         images: ${{secrets.CONTAINER_LOGIN_SERVER}}/devopsoh/api-poi:${{ steps.build-version.outputs.tag }}
+    
+    - name: Sleep
+      run: sleep 30
+    
+    - name: Check the deployed service URL for STAGING
+      uses: jtalk/url-health-check-action@v2
+      with:
+        # Check the following URLs one by one sequentially
+        url: "${{ env.staging-url }}/api/healthcheck/poi"
+        # Follow redirects, or just report success on 3xx status codes
+        follow-redirect: false # Optional, defaults to "false"
+        # Fail this action after this many failed attempts
+        max-attempts: 30 # Optional, defaults to 1
+        # Delay between retries
+        retry-delay: 10s # Optional, only applicable to max-attempts > 1
+        # Retry all errors, including 404. This option might trigger curl upgrade.
+        retry-all: false # Optional, defaults to "false"
+    
+    - name: Output container version
+      run: curl ${{ env.staging-url }}/api/version/poi
+        
