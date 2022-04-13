@@ -19,7 +19,7 @@ env:
   staging-url: 'https://devopsoh81421poi-staging.azurewebsites.net'
 
 jobs:
-  tests:
+  build:
     runs-on: ubuntu-latest
     
     defaults:
@@ -94,10 +94,10 @@ jobs:
     - uses: actions/checkout@v3
 
     # Azure Login
-    - name: Azure Login
-      run: |
-        az login --service-principal --username "${{ secrets.ARM_CLIENT_ID }}" --password "${{ secrets.ARM_CLIENT_SECRET }}" --tenant "${{ secrets.ARM_TENANT_ID }}" 
-        az account set --subscription "${{ secrets.ARM_SUBSCRIPTION_ID }}"
+    # - name: Azure Login
+    #   run: |
+    #     az login --service-principal --username "${{ secrets.ARM_CLIENT_ID }}" --password "${{ secrets.ARM_CLIENT_SECRET }}" --tenant "${{ secrets.ARM_TENANT_ID }}" 
+    #     az account set --subscription "${{ secrets.ARM_SUBSCRIPTION_ID }}"
     
     - name: Set build version
       id: build-version
@@ -107,36 +107,46 @@ jobs:
     - name: Build and push the docker image
       run: az acr build --image devopsoh/api-poi:${{ steps.build-version.outputs.tag }} --registry ${{secrets.CONTAINER_LOGIN_SERVER}} --build-arg build_version=${{ steps.build-version.outputs.tag }} --file Dockerfile .
 
-    - name: Deploy to Staging
-      uses: Azure/webapps-deploy@v2
-      with:
-        app-name: devopsoh81421poi
-        slot-name: staging # optional, default is production
-        images: ${{secrets.CONTAINER_LOGIN_SERVER}}/devopsoh/api-poi:${{ steps.build-version.outputs.tag }}
-    
-    - name: Wait for the new version
-      shell: pwsh
+    - name: Build the Docker image
       run: |
-          $retries = 99;
-          while (($retries -gt 0) -and ((Invoke-WebRequest "${{ env.staging-url }}/api/version/poi").Content -ne "${{ steps.build-version.outputs.tag }}")) {
-              $retries = $retries-1;
-              Write-Host "Not yet on the expected version... $retries retries left..."
-              Start-Sleep 5
-          }
+        echo $CR_PAT | docker login ghcr.io -u DevOpsCamp2022 --password-stdin
+        docker build . --tag ghcr.io/DevOpsCamp2022/api-poi:${{ steps.build-version.outputs.tag }}
+        docker run ghcr.io/DevOpsCamp2022/api-poi:${{ steps.build-version.outputs.tag }}
+        docker push ghcr.io/DevOpsCamp2022/api-poi:${{ steps.build-version.outputs.tag }}
+      env:
+        CR_PAT: ${{ secrets.CR_PAT }}
+
+
+    # - name: Deploy to Staging
+    #   uses: Azure/webapps-deploy@v2
+    #   with:
+    #     app-name: devopsoh81421poi
+    #     slot-name: staging # optional, default is production
+    #     images: ${{secrets.CONTAINER_LOGIN_SERVER}}/devopsoh/api-poi:${{ steps.build-version.outputs.tag }}
     
-    - name: Check the deployed service URL for STAGING
-      uses: jtalk/url-health-check-action@v2
-      with:
-        # Check the following URLs one by one sequentially
-        url: "${{ env.staging-url }}/api/healthcheck/poi"
-        # Follow redirects, or just report success on 3xx status codes
-        follow-redirect: false # Optional, defaults to "false"
-        # Fail this action after this many failed attempts
-        max-attempts: 30 # Optional, defaults to 1
-        # Delay between retries
-        retry-delay: 10s # Optional, only applicable to max-attempts > 1
-        # Retry all errors, including 404. This option might trigger curl upgrade.
-        retry-all: false # Optional, defaults to "false"
+    # - name: Wait for the new version
+    #   shell: pwsh
+    #   run: |
+    #       $retries = 99;
+    #       while (($retries -gt 0) -and ((Invoke-WebRequest "${{ env.staging-url }}/api/version/poi").Content -ne "${{ steps.build-version.outputs.tag }}")) {
+    #           $retries = $retries-1;
+    #           Write-Host "Not yet on the expected version... $retries retries left..."
+    #           Start-Sleep 5
+    #       }
+    
+    # - name: Check the deployed service URL for STAGING
+    #   uses: jtalk/url-health-check-action@v2
+    #   with:
+    #     # Check the following URLs one by one sequentially
+    #     url: "${{ env.staging-url }}/api/healthcheck/poi"
+    #     # Follow redirects, or just report success on 3xx status codes
+    #     follow-redirect: false # Optional, defaults to "false"
+    #     # Fail this action after this many failed attempts
+    #     max-attempts: 30 # Optional, defaults to 1
+    #     # Delay between retries
+    #     retry-delay: 10s # Optional, only applicable to max-attempts > 1
+    #     # Retry all errors, including 404. This option might trigger curl upgrade.
+    #     retry-all: false # Optional, defaults to "false"
     
     - name: Output container version
       run: curl ${{ env.staging-url }}/api/version/poi
