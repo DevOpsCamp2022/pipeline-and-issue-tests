@@ -116,13 +116,12 @@ jobs:
       env:
         CR_PAT: ${{ secrets.CR_PAT }}
 
-
-    # - name: Deploy to Staging
-    #   uses: Azure/webapps-deploy@v2
-    #   with:
-    #     app-name: devopsoh81421poi
-    #     slot-name: staging # optional, default is production
-    #     images: ${{secrets.CONTAINER_LOGIN_SERVER}}/devopsoh/api-poi:${{ steps.build-version.outputs.tag }}
+    - name: Deploy to Staging
+      uses: Azure/webapps-deploy@v2
+      with:
+        app-name: devopscamp2022poi
+        slot-name: staging # optional, default is production
+        images: ghcr.io/devopscamp2022/api-poi:${{ steps.build-version.outputs.tag }}
     
     # - name: Wait for the new version
     #   shell: pwsh
