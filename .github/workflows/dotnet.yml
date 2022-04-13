@@ -112,7 +112,6 @@ jobs:
       run: |
         echo $CR_PAT | docker login ghcr.io -u devopscamp2022 --password-stdin
         docker build --tag ghcr.io/devopscamp2022/api-poi:${{ steps.build-version.outputs.tag }} --build-arg build_version=${{ steps.build-version.outputs.tag }} --file Dockerfile .
-        docker run ghcr.io/devopscamp2022/api-poi:${{ steps.build-version.outputs.tag }}
         docker push ghcr.io/devopscamp2022/api-poi:${{ steps.build-version.outputs.tag }}
       env:
         CR_PAT: ${{ secrets.CR_PAT }}
