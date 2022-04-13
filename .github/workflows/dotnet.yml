@@ -19,7 +19,7 @@ env:
   staging-url: 'https://devopsoh81421poi-staging.azurewebsites.net'
 
 jobs:
-  build:
+  tests:
     runs-on: ubuntu-latest
     
     defaults:
@@ -104,13 +104,13 @@ jobs:
       run: echo "::set-output name=tag::$(date +%s)-${{ github.sha }}"
 
     # Build and push image to acr
-    - name: Build and push the docker image
-      run: az acr build --image devopsoh/api-poi:${{ steps.build-version.outputs.tag }} --registry ${{secrets.CONTAINER_LOGIN_SERVER}} --build-arg build_version=${{ steps.build-version.outputs.tag }} --file Dockerfile .
+    # - name: Build and push the docker image
+    #   run: az acr build --image devopsoh/api-poi:${{ steps.build-version.outputs.tag }} --registry ${{secrets.CONTAINER_LOGIN_SERVER}} --build-arg build_version=${{ steps.build-version.outputs.tag }} --file Dockerfile .
 
-    - name: Build the Docker image
+    - name: Build and push the docker image
       run: |
         echo $CR_PAT | docker login ghcr.io -u DevOpsCamp2022 --password-stdin
-        docker build . --tag ghcr.io/DevOpsCamp2022/api-poi:${{ steps.build-version.outputs.tag }}
+        docker build --tag ghcr.io/DevOpsCamp2022/api-poi:${{ steps.build-version.outputs.tag }} --build-arg build_version=${{ steps.build-version.outputs.tag }} --file Dockerfile .
         docker run ghcr.io/DevOpsCamp2022/api-poi:${{ steps.build-version.outputs.tag }}
         docker push ghcr.io/DevOpsCamp2022/api-poi:${{ steps.build-version.outputs.tag }}
       env:
