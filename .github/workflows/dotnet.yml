@@ -15,8 +15,8 @@ on:
         description: Force the deployment step
  
 env:
-  prod-url: 'https://devopsoh81421poi.azurewebsites.net'
-  staging-url: 'https://devopsoh81421poi-staging.azurewebsites.net'
+  prod-url: 'https://devopscamp2022poi.azurewebsites.net'
+  staging-url: 'https://devopscamp2022poi-staging.azurewebsites.net'
 
 jobs:
   tests:
