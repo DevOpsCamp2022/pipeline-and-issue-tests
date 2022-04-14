@@ -3,6 +3,7 @@ name: 'Userprofile API CI/CD Pipeline: build/test/deploy'
 on:
   push:
     paths:
+    - '.github/workflows/userprofile.yml'
     - 'apis/userprofile/**'
     branches: [ feature/userprofile-cicd ]
   pull_request:
