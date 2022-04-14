@@ -41,6 +41,10 @@ jobs:
       id: test
       run: npm test
       
+    - name: Set build version
+      id: build-version
+      run: echo "::set-output name=tag::$(date +%s)-${{ github.sha }}"
+      
     - name: Build and push the docker image
       run: |
         echo $CR_PAT | docker login ghcr.io -u devopscamp2022 --password-stdin
