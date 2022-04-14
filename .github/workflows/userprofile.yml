@@ -40,3 +40,11 @@ jobs:
     - name: Test
       id: test
       run: npm test
+      
+    - name: Build and push the docker image
+      run: |
+        echo $CR_PAT | docker login ghcr.io -u devopscamp2022 --password-stdin
+        docker build --tag ghcr.io/devopscamp2022/api-userprofile:${{ steps.build-version.outputs.tag }} --build-arg build_version=${{ steps.build-version.outputs.tag }} --file Dockerfile .
+        docker push ghcr.io/devopscamp2022/api-userprofile:${{ steps.build-version.outputs.tag }}
+      env:
+        CR_PAT: ${{ secrets.CR_PAT }}
