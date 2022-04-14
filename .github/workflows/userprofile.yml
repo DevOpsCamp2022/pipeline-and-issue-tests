@@ -31,8 +31,9 @@ jobs:
 
     - name: Build
       id: build
-      run: npm ci
-      run: npm build
+      run: |
+        npm ci
+        npm build
 
     - name: Test
       id: test
