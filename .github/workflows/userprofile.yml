@@ -23,19 +23,16 @@ jobs:
         working-directory: 'apis/userprofile/'
 
     steps:
-
-    - name: build 
-      uses: actions/setup-node@v2
+    - uses: actions/setup-node@v2
       with:
-        node-version: '14.x'
-        registry-url: 'https://registry.npmjs.org'
+          node-version: '14.x'
+          registry-url: 'https://registry.npmjs.org'
+
+    - name: Build
+      id: build
       run: npm ci
       run: npm build
-      run: npm test
 
-    - name: test 
-      uses: actions/setup-node@v2
-      with:
-        node-version: '14.x'
-        registry-url: 'https://registry.npmjs.org'
+    - name: Test
+      id: test
       run: npm test
