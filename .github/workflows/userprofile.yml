@@ -4,7 +4,7 @@ on:
   push:
     paths:
     - 'apis/userprofile/**'
-    branches: [ main ]
+    branches: [ feature/userprofile-cicd ]
   pull_request:
     paths:
     - 'apis/userprofile/**'
